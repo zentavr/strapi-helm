@@ -5,18 +5,27 @@
 #Since this chart should use shared file and data stores you should be able to up the replicas if needed.
 replicaCount: 1
 
-#Had to make a kubernetes happy version of the strapi docker image.  Look here: https://github.com/ryuheiyokokawa/strapi-docker
-#Might have to host your own registry.  I based above on this: https://github.com/strapi/strapi-docker/strapi/
+# We use https://hub.docker.com/r/naskio/strapi image here.
 image:
-  repository: registry.default.com/ry/strapi
+  registry: docker.io
+  repository: naskio/strapi
+  tag: 4.5.4-alpine
   pullPolicy: IfNotPresent
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## e.g:
+  ## pullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  pullSecrets: []
 
-#Used NFS as a datastore for this project since I already had a server running.
-nfs:
-  server: "nfs.default.com"
-  path: "/srv/strapi-store"
+#### #Used NFS as a datastore for this project since I already had a server running.
+#### nfs:
+####   server: "nfs.default.com"
+####   path: "/srv/strapi-store"
 
-#Strapi wants to know how its going to be exposed to the outside world through a proxy.
+#Strapi wants to know how it's going to be exposed to the outside world through a proxy.
 proxy:
   enabled: true
   ssl: true
@@ -33,9 +42,8 @@ db:
   port: "3306"
   username: strapi
 
-#Registry credentials might be required if you have a private registry: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-imagePullSecrets: 
-  - name: regcred
+#### #Registry credentials might be required if you have a private registry: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+#### imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
@@ -64,9 +72,11 @@ service:
   type: LoadBalancer
   port: 1337
 
-#Make sure to set your host
+# TODO: Make sure to set your host
 ingress:
   enabled: false
+  pathType: ImplementationSpecific
+  hostname: strapi.local
   hosts:
     - host: strapi.default.com
       paths: []
@@ -74,6 +84,33 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
+## Persistence Parameters
+## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+  ##
+  enabled: true
+  ## @param persistence.storageClass Persistent Volume storage class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner
+  ##
+  storageClass: ""
+  ## @param persistence.annotations Additional custom annotations for the PVC
+  ##
+  annotations: {}
+  ## @param persistence.accessModes [array] Persistent Volume access modes
+  ##
+  accessModes:
+    - ReadWriteOnce
+  ## @param persistence.size Persistent Volume size
+  ##
+  size: 8Gi
+  ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+  ##
+  existingClaim: ""
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

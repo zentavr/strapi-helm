@@ -1,7 +1,31 @@
+annotations:
+  category: CMS
 apiVersion: v2
-name: strapi
-description: A Strapi Helm chart for Kubernetes
+# This is the version number of the application being deployed. This version number should be
+# incremented each time you make changes to the application.
+appVersion: 4.5.4-alpine
 
+dependencies:
+  - name: common
+    repository: https://charts.bitnami.com/bitnami
+    tags:
+      - bitnami-common
+    version: 1.x.x
+description: A Strapi Helm chart for Kubernetes
+keywords:
+  - http
+  - web
+  - application
+  - nodejs
+  - javascript
+maintainers:
+  - name: Andrii Miroshnychenko
+    email: zentavr@trafford.com.ua
+  - name: Ryuhei Yokokawa
+    url: https://github.com/ryuheiyokokawa
+name: strapi
+sources:
+  - https://github.com/zentavr/strapi-helm
 # A chart can be either an 'application' or a 'library' chart.
 #
 # Application charts are a collection of templates that can be packaged into versioned archives
@@ -15,7 +39,3 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 version: 0.1.1
-
-# This is the version number of the application being deployed. This version number should be
-# incremented each time you make changes to the application.
-appVersion: 1.16.0
