@@ -1,1 +1,2 @@
-values.production.yaml
+values.*.yaml
+*.tmp.sh

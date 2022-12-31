@@ -1,14 +1,33 @@
+{{- if and (include "strapi.host" .) .Values.persistence.enabled  (eq .Values.persistence.provisioning "static") (not .Values.persistence.existingClaim) -}}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: strapi-volume
+  name: {{ include "common.names.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels: {{- include "common.labels.standard" . | nindent 4 }}
+    app.kubernetes.io/component: strapi
+    {{- if .Values.commonLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.commonLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.persistence.pvExtraLabels }}
+    {{- include "common.tplvalues.render" ( dict "value" .Values.persistence.pvExtraLabels "context" $ ) | nindent 4 }}
+    {{- end }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" .Values.commonAnnotations "context" $ ) | nindent 4 }}
 spec:
   capacity:
-    storage: 10Gi
+    storage: {{ .Values.persistence.size | quote }}
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteMany
-  nfs:
-    path: {{.Values.nfs.path}}
-    server: {{.Values.nfs.server}}
+  {{- if not (empty .Values.persistence.accessModes) }}
+  {{- range .Values.persistence.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  {{- else }}
+    - {{ .Values.persistence.accessMode | quote }}
+  {{- end }}
+  {{- if .Values.persistence.pvExtraSpec }}
+  {{- include "common.tplvalues.render" ( dict "value" .Values.persistence.pvExtraSpec "context" $ ) | nindent 2 }}
+  {{- end }}
   persistentVolumeReclaimPolicy: Retain
+  {{- include "common.storage.class" (dict "persistence" .Values.persistence "global" .Values.global) | nindent 2 }}
+{{- end -}}

@@ -32,26 +32,6 @@ Create chart name and version as used by the chart label.
 {{- end -}}
 
 {{/*
-Common labels
-*/}}
-{{- define "strapi.labels" -}}
-helm.sh/chart: {{ include "strapi.chart" . }}
-{{ include "strapi.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- end -}}
-
-{{/*
-Selector labels
-*/}}
-{{- define "strapi.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "strapi.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end -}}
-
-{{/*
 Create the name of the service account to use
 */}}
 {{- define "strapi.serviceAccountName" -}}
@@ -63,10 +43,24 @@ Create the name of the service account to use
 {{- end -}}
 
 {{/*
+Return the Database Secret Name
+*/}}
+{{- define "strapi.databaseSecretName" -}}
+{{- printf "%s-externaldb" (include "common.names.fullname" .) -}}
+{{- end -}}
+
+{{/*
 Return the proper image name to change the volume permissions
 */}}
 {{- define "strapi.volumePermissions.image" -}}
 {{ include "common.images.image" (dict "imageRoot" .Values.volumePermissions.image "global" .Values.global) }}
+{{- end -}}
+
+{{/*
+Return the proper Strapi image name
+*/}}
+{{- define "strapi.image" -}}
+{{ include "common.images.image" (dict "imageRoot" .Values.image "global" .Values.global) }}
 {{- end -}}
 
 {{/*
@@ -95,9 +89,19 @@ If not using ClusterIP, or if a host or LoadBalancerIP is not defined, the value
 {{- define "strapi.host" -}}
 {{- if .Values.ingress.enabled }}
     {{- printf "%s%s" .Values.ingress.hostname .Values.ingress.path | default "" -}}
-{{- else if .Values.ghostHost -}}
-    {{- printf "%s%s" .Values.ghostHost .Values.ghostPath | default "" -}}
+{{- else if .Values.strapiHost -}}
+    {{- printf "%s%s" .Values.strapiHost .Values.strapiPath | default "" -}}
 {{- else -}}
     {{- include "strapi.serviceIP" . -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return true if cert-manager required annotations for TLS signed certificates are set in the Ingress annotations
+Ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+*/}}
+{{- define "strapi.ingress.certManagerRequest" -}}
+{{ if or (hasKey . "cert-manager.io/cluster-issuer") (hasKey . "cert-manager.io/issuer") }}
+    {{- true -}}
 {{- end -}}
 {{- end -}}

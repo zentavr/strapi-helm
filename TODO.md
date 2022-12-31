@@ -1,5 +1,5 @@
 # TODO
-- [ ] PV. We must honor additional CSI parameters. EFS on Fargate supports only static volume provisioning.
+- [x] PV. We must honor additional CSI parameters. EFS on Fargate supports only static volume provisioning.
   ```yaml
   apiVersion: v1
   kind: PersistentVolume
@@ -18,26 +18,41 @@
       volumeHandle: fs-4af69aab
   ```
 - [x] PVC
-  - [ ] In case of AWS we need to use more features, i.e.:
+  - [x] In case of AWS we need to use more features, i.e.:
     * `volumeName`
     * `selector`. PV should have additional labels!!!
     Maybe the solution could be:
     1. Define `.persistence.enabled` as `true`
     2. Define `.persistence.existingClaim` to some value
     3. Define `.extraDeploy` with `PersistentVolumeClaim` and `PersistentVolume` extra objects. 
-- [ ] Secrets. Can we use Amazon Secret Manager?
-  * [ ] Secrets for DB
-  * [ ] Secrets for something else?
-- [ ] Service Account: Do we need it? Probably yes.
+- [..] Secrets. Can we use Amazon Secret Manager?
+  * [..] Secrets for DB
+  * [x] Secrets for something else? - We do not have anything else
+- [x] Service Account: Do we need it? Probably yes.
 - [ ] Refactor Ingress
 - [ ] refactor Service
 - [ ] refactor deployment
-- [ ] Do we need Extralist? In case we want to extra deploy something.
+- [x] Do we need Extralist? In case we want to extra deploy something.
 - [ ] TLS Secrets
-- [ ] Network Policies
-  * [ ] Backend Ingress
-  * [ ] Egress
-  * [ ] Ingress
+- [ ] Network Policies - not yet :)
+  * [ ] Backend Ingress - not yet :)
+  * [ ] Egress - not yet :)
+  * [ ] Ingress - not yet :)
+
+Project: `/srv/app`.
+
+When creating a new project with this image you can pass database configurations to the strapi new command.
+
+    NODE_ENV The environment in which the application is running. (production, development)
+    DATABASE_CLIENT a database provider supported by Strapi: (sqlite, postgres, mysql ,mongo).
+    DATABASE_HOST database host.
+    DATABASE_PORT database port.
+    DATABASE_NAME database name.
+    DATABASE_USERNAME database username.
+    DATABASE_PASSWORD database password.
+    DATABASE_SSL boolean for SSL.
+    EXTRA_ARGS pass extra args to the strapi new.
+
 
 Multiply pods spec:
 ```yaml
