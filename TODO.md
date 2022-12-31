@@ -29,9 +29,9 @@
   * [..] Secrets for DB
   * [x] Secrets for something else? - We do not have anything else
 - [x] Service Account: Do we need it? Probably yes.
-- [ ] Refactor Ingress
-- [ ] refactor Service
-- [ ] refactor deployment
+- [x] Refactor Ingress
+- [x] refactor Service
+- [x] refactor deployment
 - [x] Do we need Extralist? In case we want to extra deploy something.
 - [ ] TLS Secrets
 - [ ] Network Policies - not yet :)
