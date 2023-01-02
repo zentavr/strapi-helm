@@ -106,6 +106,8 @@ spec:
           args: {{- include "common.tplvalues.render" (dict "value" .Values.args "context" $) | nindent 12 }}
           {{- end }}
           env:
+            - name: JWT_SECRET
+              value: {{ .Values.application.jwt_secret | quote }}
             - name: NODE_ENV
               value: {{ .Values.application.node_env | quote }}
             - name: DATABASE_CLIENT
@@ -201,6 +203,8 @@ spec:
           volumeMounts:
             - name: strapi-volume-claim
               mountPath: /srv/app
+            - name: strapi-config-plugins-js
+              mountPath: /srv/app/config/env/{{ .Values.application.node_env }}
             {{- if .Values.extraVolumeMounts }}
             {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
             {{- end }}
@@ -218,4 +222,7 @@ spec:
         {{- if .Values.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
         {{- end }}
+        - name: strapi-config-plugins-js
+          configMap:
+            name: {{ template "common.names.fullname" . }}-config-js
 {{- end -}}

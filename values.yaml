@@ -13,6 +13,7 @@ application:
   db_ssl: true
   # pass extra args to the strapi new.
   extra_args: ""
+  jwt_secret: "a412919e7786427affc32776fc91308cd9b70b483f7bee1cbc5067947968adf0dc6c83bcec86e65d207f2fe5cc71f1ddbb14f7346f62b91836648804cc49f2c0"
 
 externalDatabase:
   ## @param externalDatabase.existingSecret The name of an existing secret with database credentials
@@ -174,7 +175,7 @@ extraEnvVarsCM: ""
 ##
 extraEnvVarsSecret: ""
 
-## Configure extra options for Ghost containers' liveness, readiness and startup probes
+## Configure extra options for Strapi containers' liveness, readiness and startup probes
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/#configure-probes
 ## @param startupProbe.enabled Enable startupProbe
 ## @param startupProbe.initialDelaySeconds Initial delay seconds for startupProbe
@@ -282,6 +283,7 @@ serviceAccount:
 ##
 podSecurityContext:
   enabled: true
+  # Volumes that support ownership management are modified to be owned and writable by the GID specified in fsGroup
   fsGroup: 1000
 ## Configure Container Security Context (only main container)
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container

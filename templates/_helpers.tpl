@@ -105,3 +105,16 @@ Ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
     {{- true -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Defines config/plugins.js configuration file
+*/}}
+{{- define "strapi.config.plugins" -}}
+module.exports = ({ env }) => ({
+  "users-permissions": {
+    config: {
+      jwtSecret: env('JWT_SECRET'),
+    }
+  }
+})
+{{- end -}}
