@@ -3,6 +3,11 @@
 # Declare variables to be passed into your templates.
 
 application:
+  # During the first run we do not mount additional configs (like proxy/JWT_tokens setup).
+  #  If we mount the configuration - "strapi new" command fails with "You can only create a Strapi app in an empty directory."
+  #  error.
+  first_run: true
+  app_url: ""
   node_env: "production"
   db_client: "postgres"
   db_host: "localhost"
@@ -14,6 +19,9 @@ application:
   # pass extra args to the strapi new.
   extra_args: ""
   jwt_secret: "a412919e7786427affc32776fc91308cd9b70b483f7bee1cbc5067947968adf0dc6c83bcec86e65d207f2fe5cc71f1ddbb14f7346f62b91836648804cc49f2c0"
+  strapi_telemetry_disabled: "true"
+  #Strapi wants to know how it's going to be exposed to the outside world through a proxy.
+  proxy_enabled: false
 
 externalDatabase:
   ## @param externalDatabase.existingSecret The name of an existing secret with database credentials
@@ -132,16 +140,6 @@ extraDeploy: []
 ##
 existingSecret: ""
 
-## @param podLabels Extra labels for Strapi pods
-## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
-##
-podLabels: {}
-
-## @param podAnnotations Annotations for Strapi pods
-## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
-##
-podAnnotations: {}
-
 ## @param affinity Affinity for pod assignment
 ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 ## NOTE: podAffinityPreset, podAntiAffinityPreset, and nodeAffinityPreset will be ignored when it's set
@@ -228,16 +226,11 @@ customReadinessProbe: {}
 ## Custom startupProbe block
 customStartupProbe: {}
 
-
-
-
-
-
 # We use https://hub.docker.com/r/naskio/strapi image here.
 image:
   registry: docker.io
   repository: naskio/strapi
-  tag: 4.5.4-alpine
+  tag: 4.5.5-alpine
   pullPolicy: IfNotPresent
   ## Optionally specify an array of imagePullSecrets.
   ## Secrets must be manually created in the namespace.
@@ -254,13 +247,6 @@ strapiHost: ""
 ## @param strapiPath URL sub path where to server the Strapi application
 ##
 strapiPath: /
-
-#Strapi wants to know how it's going to be exposed to the outside world through a proxy.
-proxy:
-  enabled: true
-  ssl: true
-  domain: "strapi.default.com"
-  port: 443
 
 nameOverride: ""
 fullnameOverride: ""

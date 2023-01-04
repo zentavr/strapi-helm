@@ -14,3 +14,5 @@ metadata:
 data:
   plugins.js: |
     {{- include "strapi.config.plugins" . | nindent 4 }}
+  server.js: |
+    {{- include "strapi.config.server" . | nindent 4 }}

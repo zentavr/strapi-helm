@@ -46,7 +46,14 @@ Create the name of the service account to use
 Return the Database Secret Name
 */}}
 {{- define "strapi.databaseSecretName" -}}
-{{- printf "%s-externaldb" (include "common.names.fullname" .) -}}
+{{- printf "%s-externaldb" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{/*
+Return the Application Secret Name
+*/}}
+{{- define "strapi.appSecretName" -}}
+{{- printf "%s-app" (include "common.names.fullname" .) | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -117,4 +124,19 @@ module.exports = ({ env }) => ({
     }
   }
 })
+{{- end -}}
+
+{{/*
+Defines config/server.js configuration file
+*/}}
+{{- define "strapi.config.server" -}}
+module.exports = ({ env }) => ({
+  host: env('HOST', '0.0.0.0'),
+  port: env.int('PORT', 1337),
+  app: {
+    keys: env.array('APP_KEYS'),
+  },
+  proxy: env.bool('PROXY_ENABLED', false),
+  url: env('APP_URL', ''),
+});
 {{- end -}}

@@ -25,6 +25,7 @@ spec:
         {{- include "common.tplvalues.render" (dict "value" .Values.podLabels "context" $) | nindent 8 }}
         {{- end }}
       annotations:
+        checksum/app-secrets: {{ include (print $.Template.BasePath "/app-secrets.yaml") . | sha256sum }}
         {{- if .Values.podAnnotations }}
         {{- include "common.tplvalues.render" ( dict "value" .Values.podAnnotations "context" $ ) | nindent 8 }}
         {{- end }}
@@ -106,8 +107,13 @@ spec:
           args: {{- include "common.tplvalues.render" (dict "value" .Values.args "context" $) | nindent 12 }}
           {{- end }}
           env:
+            - name: STRAPI_TELEMETRY_DISABLED
+              value: {{ .Values.application.strapi_telemetry_disabled | quote }}
             - name: JWT_SECRET
-              value: {{ .Values.application.jwt_secret | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "strapi.appSecretName" . }}
+                  key: jwt-secret
             - name: NODE_ENV
               value: {{ .Values.application.node_env | quote }}
             - name: DATABASE_CLIENT
@@ -130,13 +136,11 @@ spec:
             - name: EXTRA_ARGS
               value: {{ .Values.application.extra_args | quote }}
             - name: PROXY_ENABLED
-              value: "{{.Values.proxy.enabled}}"
-            - name: PROXY_SSL
-              value: "{{.Values.proxy.ssl}}"
-            - name: PROXY_DOMAIN
-              value: "{{.Values.proxy.domain}}"
-            - name: PROXY_PORT
-              value: "{{.Values.proxy.port}}"
+              value: "{{.Values.application.proxy_enabled }}"
+            {{- if .Values.application.app_url }}
+            - name: APP_URL
+              value: "{{.Values.application.app_url }}"
+            {{- end }}
             {{- if .Values.extraEnvVars }}
             {{- include "common.tplvalues.render" ( dict "value" .Values.extraEnvVars "context" $ ) | nindent 12 }}
             {{- end }}
@@ -203,8 +207,10 @@ spec:
           volumeMounts:
             - name: strapi-volume-claim
               mountPath: /srv/app
-            - name: strapi-config-plugins-js
+            {{- if (not .Values.application.first_run) }}
+            - name: strapi-config-environment-js
               mountPath: /srv/app/config/env/{{ .Values.application.node_env }}
+            {{- end }}
             {{- if .Values.extraVolumeMounts }}
             {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
             {{- end }}
@@ -222,7 +228,9 @@ spec:
         {{- if .Values.extraVolumes }}
         {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumes "context" $) | nindent 8 }}
         {{- end }}
-        - name: strapi-config-plugins-js
+        {{- if (not .Values.application.first_run) }}
+        - name: strapi-config-environment-js
           configMap:
             name: {{ template "common.names.fullname" . }}-config-js
+        {{- end }}
 {{- end -}}
