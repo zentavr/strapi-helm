@@ -1,1 +1,4 @@
-values.production.yaml
+values.*.yaml
+*.tmp.sh
+*.tmp.md
+TODO.md
