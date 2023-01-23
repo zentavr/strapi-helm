@@ -1,0 +1,146 @@
+---
+# An example of how to deploy in AWS
+commonLabels:
+  "common.example.io/desc": "Common-Label"
+
+commonAnnotations:
+  "common.example.io/desc": "Common-Annotation"
+
+application:
+  # During the very first launch should be true. startup/liveness/readiness probes would be disabled in such case.
+  first_run: true
+  # TODO: If you change URL here, you need to do "npm run build". We need to find a way to automate that.
+  app_url: "https://d-r2z6w7-strapi.example.io"
+  node_env: "production"
+  db_client: "postgres"
+  db_host: "strapi.cluster-zxcvbn.us-east-1.rds.amazonaws.com"
+  db_port: "5432"
+  db_name: "wifimap"
+  db_username: "wifimap"
+  db_password: "zxcvbn"
+  db_ssl: true
+  # pass extra args to the strapi new.
+  extra_args: ""
+  jwt_secret: "12345"
+  strapi_telemetry_disabled: "true"
+  proxy_enabled: true
+
+# During the very first launch should be 1
+replicaCount: 1
+
+#command:
+#  - "/bin/sh"
+#args:
+#  - "-ec"
+#  - |
+#    sleep 36000
+
+# Probes: during the very first launch the Pod installs the modules with
+# 'npm install' which takes time (up to 8-10 minutes). You can disable the probes and enable them later
+# or set the initialDelaySeconds to the very great value (max = 300 sec).
+startupProbe:
+  # Default: false
+  enabled: false
+livenessProbe:
+  # Default: true
+  enabled: true
+  #initialDelaySeconds: 300
+readinessProbe:
+  # Default: true
+  enabled: true
+  #initialDelaySeconds: 300
+
+# If you don't specify a vCPU and memory combination, then the smallest
+#  available combination is used (.25 vCPU and 0.5 GB memory).
+resources:
+#  limits:
+#    cpu: 2000m
+#    memory: 8000Mi
+  requests:
+    cpu: 1000m
+    memory: 2000Mi
+
+service:
+  # ALB Ingress requires NodePort here
+  type: NodePort
+#  annotations:
+#    alb.ingress.kubernetes.io/target-type: "ip"
+
+volumePermissions:
+  enabled: true
+
+ingress:
+  enabled: true
+  # Check Cloudformation output
+  hostname: "d-r2z6w7-strapi.example.io"
+  ingressClassName: "alb"
+  annotations:
+    #kubernetes.io/ingress.class: "alb"
+    # https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.4/guide/ingress/annotations/
+    alb.ingress.kubernetes.io/scheme: "internet-facing"
+    # Check the value from Cloudformation output
+    ## TODO: Seems like it does not like the ALB Exists??
+    ## > https://github.com/kubernetes-sigs/aws-load-balancer-controller/issues/228#issuecomment-875241647
+    ## > https://github.com/kubernetes-sigs/aws-load-balancer-controller/issues/228#issuecomment-932743243
+    ## > https://github.com/kubernetes-sigs/aws-load-balancer-controller/issues/228#issuecomment-1041983651
+    ## > https://github.com/kubernetes-sigs/aws-load-balancer-controller/issues/228#issuecomment-1148626879
+    alb.ingress.kubernetes.io/load-balancer-name: "strapi-lb"
+    alb.ingress.kubernetes.io/ip-address-type: "ipv4"
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/target-type: "ip"
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    # Should be discovered automatically
+    # alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-5678-1234-cd074b400a58"
+    alb.ingress.kubernetes.io/backend-protocol: "HTTP"
+    # Check from Cfn.Output: albIngressGroupDotNameAnnotationValue
+    alb.ingress.kubernetes.io/group.name: "strapi"
+    alb.ingress.kubernetes.io/group.order: "10"
+    #alb.ingress.kubernetes.io/load-balancer-attributes: "deletion_protection.enabled=true"
+    # TODO: Can we manage SG which had been created by CDK???
+    # alb.ingress.kubernetes.io/security-groups
+    # alb.ingress.kubernetes.io/manage-backend-security-group-rules: "true"
+
+  path: "/*"
+  pathType: "ImplementationSpecific"
+
+# We need some extra objects to be deployed. In this case we need the DB Secret
+#    which is kept in AWS Secret Manager
+# > https://www.eksworkshop.com/beginner/194_secrets_manager/sync_native_secrets_env/
+##extraDeploy:
+##  - apiVersion: secrets-store.csi.x-k8s.io/v1
+##    kind: SecretProviderClass
+##    metadata:
+##      name: strapi-db-spc-k8s-secrets
+##    spec:
+##      provider: aws
+##      parameters:
+##        objects: |
+##          - objectName: "arn:aws:secretsmanager:us-east-1:740462994053:secret:wifimapwebsitestagingdbsecr-CkhZk7eNimAF-V3IPEa"
+##            objectType: "secretsmanager"
+##            jmesPath:
+##              - path: password
+##                objectAlias: db-password
+##      secretObjects:
+##        - secretName: postgresql-db-password
+##          type: Opaque
+##          data:
+##            - key: database-password
+##              objectName: db-password
+
+persistence:
+  enabled: true
+  storageClass: "efs-sc"
+  selector:
+    matchLabels:
+      "strapi.io/volumeType": "data"
+  accessModes:
+    - ReadWriteMany
+  provisioning: static
+  pvExtraSpec:
+    csi:
+      driver: efs.csi.aws.com
+      volumeHandle: fs-0301234567892120f
+  pvExtraLabels:
+    "strapi.io/volumeType": "data"
+
+# https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html

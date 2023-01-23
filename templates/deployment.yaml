@@ -159,7 +159,7 @@ spec:
             - name: strapi-svc
               containerPort: 1337
               protocol: TCP
-          {{- if .Values.startupProbe.enabled }}
+          {{- if and .Values.startupProbe.enabled (not .Values.application.first_run) }}
           startupProbe:
             httpGet:
               path: /
@@ -173,7 +173,7 @@ spec:
           {{- else if .Values.customStartupProbe }}
           startupProbe: {{- include "common.tplvalues.render" (dict "value" .Values.customStartupProbe "context" $) | nindent 12 }}
           {{- end }}
-          {{- if .Values.livenessProbe.enabled }}
+          {{- if and .Values.livenessProbe.enabled (not .Values.application.first_run) }}
           livenessProbe:
             httpGet:
               path: /
@@ -187,7 +187,7 @@ spec:
           {{- else if .Values.customLivenessProbe }}
           livenessProbe: {{- include "common.tplvalues.render" (dict "value" .Values.customLivenessProbe "context" $) | nindent 12 }}
           {{- end }}
-          {{- if .Values.readinessProbe.enabled }}
+          {{- if and .Values.readinessProbe.enabled (not .Values.application.first_run) }}
           readinessProbe:
             httpGet:
               path: /

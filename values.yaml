@@ -6,6 +6,7 @@ application:
   # During the first run we do not mount additional configs (like proxy/JWT_tokens setup).
   #  If we mount the configuration - "strapi new" command fails with "You can only create a Strapi app in an empty directory."
   #  error.
+  # During the very first launch should be true. startup/liveness/readiness probes would be disabled in such case.
   first_run: true
   app_url: ""
   node_env: "production"
@@ -230,7 +231,7 @@ customStartupProbe: {}
 image:
   registry: docker.io
   repository: naskio/strapi
-  tag: 4.5.5-alpine
+  tag: 4.5.6-alpine
   pullPolicy: IfNotPresent
   ## Optionally specify an array of imagePullSecrets.
   ## Secrets must be manually created in the namespace.

@@ -20,3 +20,9 @@
 .idea/
 *.tmproj
 .vscode/
+
+# Local Files
+values.*.yaml
+*.tmp.sh
+*.tmp.md
+*.tmp.sql
