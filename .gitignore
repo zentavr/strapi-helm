@@ -1,4 +1,6 @@
 values.*.yaml
+!values.example.yaml
 *.tmp.sh
 *.tmp.md
+*.tmp.sql
 TODO.md
