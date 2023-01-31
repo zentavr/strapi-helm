@@ -84,7 +84,7 @@ spec:
           {{- end }}
           volumeMounts:
             - name: strapi-volume-claim
-              mountPath: /srv/app
+              mountPath: {{ .Values.application.mount_folder | quote }}
         {{- end }}
         {{- if .Values.initContainers }}
         {{- include "common.tplvalues.render" (dict "value" .Values.initContainers "context" $) | nindent 8 }}
@@ -206,7 +206,7 @@ spec:
           {{- end }}
           volumeMounts:
             - name: strapi-volume-claim
-              mountPath: /srv/app
+              mountPath: {{ .Values.application.mount_folder | quote }}
             {{- if (not .Values.application.first_run) }}
             - name: strapi-config-environment-js
               mountPath: /srv/app/config/env/{{ .Values.application.node_env }}
