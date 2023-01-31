@@ -16,3 +16,5 @@ data:
     {{- include "strapi.config.plugins" . | nindent 4 }}
   server.js: |
     {{- include "strapi.config.server" . | nindent 4 }}
+  database.js: |
+    {{- include "strapi.config.database" . | nindent 4 }}

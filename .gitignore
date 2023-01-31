@@ -1,5 +1,5 @@
 values.*.yaml
-values.*-*.yaml
+values.*.yml
 !values.example.yaml
 *.tmp.sh
 *.tmp.md

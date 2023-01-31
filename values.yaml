@@ -23,6 +23,8 @@ application:
   strapi_telemetry_disabled: "true"
   #Strapi wants to know how it's going to be exposed to the outside world through a proxy.
   proxy_enabled: false
+  # Where to mount RWX folder: '/srv/app', '/srv/app/public/uploads', etc
+  mount_folder: "/srv/app"
 
 externalDatabase:
   ## @param externalDatabase.existingSecret The name of an existing secret with database credentials
