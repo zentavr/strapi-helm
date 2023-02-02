@@ -9,6 +9,13 @@ application:
   # During the very first launch should be true. startup/liveness/readiness probes would be disabled in such case.
   first_run: true
   app_url: ""
+  app_keys:
+    # dd if=/dev/urandom bs=16 count=1 2>/dev/null | base64
+    - "vmh9PNPCfiB/tF/JEwFhPw=="
+    - "D4mkjgG/yY++fej7xR45lA=="
+    - "Vt7XGJ8NRM6NbP/KbdqfKg=="
+    - "pLBQIJf6I8HhROByd1R5Jg=="
+  api_token_salt: "M+6o8OgP1pgphfjasfq2ZQ=="
   node_env: "production"
   db_client: "postgres"
   db_host: "localhost"
@@ -19,6 +26,7 @@ application:
   db_ssl: true
   # pass extra args to the strapi new.
   extra_args: ""
+  admin_jwt_secret: "hmIxQzM+Enpo7W6mGKue5w=="
   jwt_secret: "a412919e7786427affc32776fc91308cd9b70b483f7bee1cbc5067947968adf0dc6c83bcec86e65d207f2fe5cc71f1ddbb14f7346f62b91836648804cc49f2c0"
   strapi_telemetry_disabled: "true"
   #Strapi wants to know how it's going to be exposed to the outside world through a proxy.
@@ -49,7 +57,7 @@ replicaCount: 1
 ##
 updateStrategy:
   type: RollingUpdate
-## @param priorityClassName Ghost pod priority class name
+## @param priorityClassName Strapi pod priority class name
 ##
 priorityClassName: ""
 ## @param schedulerName Name of the k8s scheduler (other than default)
@@ -65,13 +73,13 @@ topologySpreadConstraints: []
 ## https://kubernetes.io/docs/concepts/services-networking/add-entries-to-pod-etc-hosts-with-host-aliases/
 ##
 hostAliases: []
-## @param extraVolumes Optionally specify extra list of additional volumes for Ghost pods
+## @param extraVolumes Optionally specify extra list of additional volumes for Strapi pods
 ##
 extraVolumes: []
-## @param extraVolumeMounts Optionally specify extra list of additional volumeMounts for Ghost container(s)
+## @param extraVolumeMounts Optionally specify extra list of additional volumeMounts for Strapi container(s)
 ##
 extraVolumeMounts: []
-## @param sidecars Add additional sidecar containers to the Ghost pod
+## @param sidecars Add additional sidecar containers to the Strapi pod
 ## e.g:
 ## sidecars:
 ##   - name: your-image-name
@@ -82,7 +90,7 @@ extraVolumeMounts: []
 ##         containerPort: 1234
 ##
 sidecars: []
-## @param initContainers Add additional init containers to the Ghost pods
+## @param initContainers Add additional init containers to the Strapi pods
 ## ref: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
 ## e.g:
 ## initContainers:
@@ -94,7 +102,7 @@ sidecars: []
 ##        containerPort: 1234
 ##
 initContainers: []
-## @param podLabels Extra labels for Ghost pods
+## @param podLabels Extra labels for Strapi pods
 ## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
 ##
 podLabels: {}
@@ -162,7 +170,7 @@ command: []
 ## @param args Override default container args (useful when using custom images)
 ##
 args: []
-## @param extraEnvVars Array with extra environment variables to add to the Ghost container
+## @param extraEnvVars Array with extra environment variables to add to the Strapi container
 ## e.g:
 ## extraEnvVars:
 ##   - name: FOO
@@ -267,8 +275,8 @@ serviceAccount:
 
 ## Configure Pods Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
-## @param podSecurityContext.enabled Enabled Ghost pods' Security Context
-## @param podSecurityContext.fsGroup Set Ghost pod's Security Context fsGroup
+## @param podSecurityContext.enabled Enabled Strapi pods' Security Context
+## @param podSecurityContext.fsGroup Set Strapi pod's Security Context fsGroup
 ##
 podSecurityContext:
   enabled: true
@@ -276,9 +284,9 @@ podSecurityContext:
   fsGroup: 1000
 ## Configure Container Security Context (only main container)
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
-## @param containerSecurityContext.enabled Enabled Ghost containers' Security Context
-## @param containerSecurityContext.runAsUser Set Ghost container's Security Context runAsUser
-## @param containerSecurityContext.runAsNonRoot Set Ghost container's Security Context runAsNonRoot
+## @param containerSecurityContext.enabled Enabled Strapi containers' Security Context
+## @param containerSecurityContext.runAsUser Set Strapi container's Security Context runAsUser
+## @param containerSecurityContext.runAsNonRoot Set Strapi container's Security Context runAsNonRoot
 ##
 containerSecurityContext:
   enabled: true
@@ -342,11 +350,11 @@ service:
   ##     timeoutSeconds: 300
   sessionAffinityConfig: {}
 
-## Configure the ingress resource that allows you to access the Ghost installation
+## Configure the ingress resource that allows you to access the Strapi installation
 ## ref: https://kubernetes.io/docs/user-guide/ingress/
 ##
 ingress:
-  ## @param ingress.enabled Enable ingress record generation for Ghost
+  ## @param ingress.enabled Enable ingress record generation for Strapi
   ##
   enabled: false
   ## @param ingress.pathType Ingress path type
