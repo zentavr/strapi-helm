@@ -114,6 +114,11 @@ spec:
                 secretKeyRef:
                   name: {{ include "strapi.appSecretName" . }}
                   key: jwt-secret
+            - name: ADMIN_JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "strapi.appSecretName" . }}
+                  key: admin-jwt-secret
             - name: NODE_ENV
               value: {{ .Values.application.node_env | quote }}
             - name: DATABASE_CLIENT
@@ -131,6 +136,20 @@ spec:
                 secretKeyRef:
                   name: {{ include "strapi.databaseSecretName" . }}
                   key: db-password
+            - name: APP_KEYS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "strapi.appSecretName" . }}
+                  key: app-keys
+            - name: API_TOKEN_SALT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "strapi.appSecretName" . }}
+                  key: api-token-salt
+            - name: HOST
+              value: "0.0.0.0"
+            - name: PORT
+              value: {{ .Values.service.ports.http | quote }}
             - name: DATABASE_SSL
               value: {{ ternary "true" "false" .Values.application.db_ssl | quote }}
             - name: EXTRA_ARGS
@@ -157,13 +176,13 @@ spec:
           {{- end }}
           ports:
             - name: strapi-svc
-              containerPort: 1337
+              containerPort: {{ .Values.service.ports.http }}
               protocol: TCP
           {{- if and .Values.startupProbe.enabled (not .Values.application.first_run) }}
           startupProbe:
             httpGet:
               path: /
-              port: 1337
+              port: {{ .Values.service.ports.http }}
               scheme: HTTP
             initialDelaySeconds: {{ .Values.startupProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.startupProbe.periodSeconds }}
@@ -177,7 +196,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /
-              port: 1337
+              port: {{ .Values.service.ports.http }}
               scheme: HTTP
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
@@ -191,7 +210,7 @@ spec:
           readinessProbe:
             httpGet:
               path: /
-              port: 1337
+              port: {{ .Values.service.ports.http }}
               scheme: HTTP
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
@@ -208,8 +227,20 @@ spec:
             - name: strapi-volume-claim
               mountPath: {{ .Values.application.mount_folder | quote }}
             {{- if (not .Values.application.first_run) }}
+            # Strapi could not catch the configs at the symbolic links, so we use 'subPath' here to have the static files.
+            # The content of the files are not get updated when the configmap is changes.
+            # Strapi issue: https://github.com/strapi/strapi/issues/15667
+#            - name: strapi-config-environment-js
+#              mountPath: /srv/app/config/env/{{ .Values.application.node_env }}
             - name: strapi-config-environment-js
-              mountPath: /srv/app/config/env/{{ .Values.application.node_env }}
+              mountPath: /srv/app/config/env/{{ .Values.application.node_env }}/plugins.js
+              subPath: "plugins.js"
+            - name: strapi-config-environment-js
+              mountPath: /srv/app/config/env/{{ .Values.application.node_env }}/server.js
+              subPath: "server.js"
+            - name: strapi-config-environment-js
+              mountPath: /srv/app/config/env/{{ .Values.application.node_env }}/database.js
+              subPath: "database.js"
             {{- end }}
             {{- if .Values.extraVolumeMounts }}
             {{- include "common.tplvalues.render" (dict "value" .Values.extraVolumeMounts "context" $) | nindent 12 }}
