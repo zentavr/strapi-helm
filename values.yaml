@@ -241,7 +241,7 @@ customStartupProbe: {}
 image:
   registry: docker.io
   repository: naskio/strapi
-  tag: 4.9.2-alpine
+  tag: 4.13.7-alpine
   pullPolicy: IfNotPresent
   ## Optionally specify an array of imagePullSecrets.
   ## Secrets must be manually created in the namespace.

@@ -3,14 +3,14 @@ annotations:
 apiVersion: v2
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
-appVersion: 4.9.2-alpine
+appVersion: 4.13.7-alpine
 
 dependencies:
   - name: common
     repository: https://charts.bitnami.com/bitnami
     tags:
       - bitnami-common
-    version: 1.x.x
+    version: 2.11.x
 description: A Strapi Helm chart for Kubernetes
 keywords:
   - http
@@ -38,4 +38,4 @@ type: application
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 0.3.2
+version: 0.4.2
