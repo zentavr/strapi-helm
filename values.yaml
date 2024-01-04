@@ -45,6 +45,20 @@ externalDatabase:
 ## NOTE: ReadWriteMany PVC(s) are required if replicaCount > 1
 ##
 replicaCount: 1
+## Application Autoscaling configuration
+## ref: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+## @param autoscaling.enabled Enable Horizontal POD autoscaling for WordPress
+## @param autoscaling.minReplicas Minimum number of Application replicas
+## @param autoscaling.maxReplicas Maximum number of Application replicas
+## @param autoscaling.targetCPU Target CPU utilization percentage
+## @param autoscaling.targetMemory Target Memory utilization percentage
+##
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 11
+  targetCPU: 80
+  targetMemory: 80
 ## @param updateStrategy.type Strapi deployment strategy type
 ## ref: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
 ## NOTE: Set it to `Recreate` if you use a PV that cannot be mounted on multiple pods
